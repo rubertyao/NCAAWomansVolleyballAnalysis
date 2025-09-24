@@ -1,5 +1,5 @@
 ---
-title: "An Analysis on Volleyball Statistics"
+title: "An Analysis on NCAA Woman's Volleyball Statistics"
 subtitle: "Math 261A Project 1"
 author: "Robert Yav"
 thanks: "Project repository available at: [https://github.com/peteragao/MATH261A-project-template](https://github.com/peteragao/MATH261A-project-template)."
@@ -20,31 +20,17 @@ library(ggplot2)
 
 # Introduction
 
-Volleyball is a sport that requires elite athleticism, hand-eye coordination, open communication, and most importantly, the ability to combine all of these aspects into a functioning team. One fundamental concept of volleyball is the three touch play: Receive, set, and spike. There are, however, situations in which the ball will not need an additional touch to get a point. Then begs the question: Does one need to make assists to make more kills in volleyball? If so, how important is making an assist for earning points? This project examines the relationship between the number of kills in a game to the number of assists a team makes in a volleyball game.
+Volleyball is a sport that requires elite athleticism, hand-eye coordination, open communication, and most importantly, the ability to combine all of these aspects into a functioning team. One fundamental concept of volleyball is the three touch play: Receive, set, and spike. There are, however, situations in which the ball will not need an additional touch to get a point. Then begs the question: Does one need to make assists to make more kills in volleyball? If so, will teams that make more assists score more points? This project examines the relationship between the number of kills in a game to the number of assists a team makes in a volleyball game.
 
 # Data
 
-The data set used was collected from the Division 1 Woman's NCAA Volleyball 2022-2023 season. There are 344 rows and 14 variables, with each row representing a team at the Division 1 level from the 2022-2023 season. The 14 variables include: Team, Conference, region, aces_per_set, assists_per_set, team_attacks_per_set, blocks_per_set, digs_per_set, hitting_pctg, kills_per_set, opp_hitting_pctg, W, L, and win_loss_pctg. My analysis focuses on two of the variables, kills_per_set and assists_per_set.
+The data set used was collected from the Division 1 Woman's NCAA Volleyball 2022-2023 season [@NCAA_Womens_Volleyball]. Division 1 is the highest division in college sport divisions, which means that the highest caliber of skill at the college level is displayed in these data. There are 344 rows and 14 variables, with each row representing a team at the Division 1 level from the 2022-2023 season. The 14 variables include: Team, Conference, region, aces_per_set, assists_per_set, team_attacks_per_set, blocks_per_set, digs_per_set, hitting_pctg, kills_per_set, opp_hitting_pctg, W, L, and win_loss_pctg. My analysis focuses on two of the variables, kills_per_set and assists_per_set.
 
 assists_per_set - The average amount of sets, passes, or digs to a teammate that directly result in a kill per set
 
 kills_per_set - Average amount of hits that directly result in a point per set
 
-```{r}
-#| warning: false
-#| message: false
-#| echo: false
-vb_data=read.csv("volleyball_ncaa_div1_2022_23.csv")
-ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
-  geom_point() +
-  labs(title = "Volleyball Kills as Explained by Assists",
-       subtitle= "Data from Female NCCA Teams",
-       x = "Assists per Set",
-       y = "Kills per Set")
-```
 
-A quick observation indicates no obvious outliers and a noticable positive
-pattern between the variables.
 
 # Methods
 We fit the simple linear regression model
@@ -60,9 +46,25 @@ $$Y_i = \beta_0 +\beta_1 X_i + \varepsilon_i$$
   
   $Y_i$ represents the $i^{th}$ team's kills as a response in the model.
   
-  We implement the analysis using R [@r_language]
+  We implement the analysis using R [@r_language]. Visual aid done in [@ggplot].
 
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+vb_data=read.csv("volleyball_ncaa_div1_2022_23.csv")
+ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
+  geom_point() +
+  labs(title = "Volleyball Kills as Explained by Assists",
+       subtitle= "Data from Female NCCA Teams",
+       x = "Assists per Set",
+       y = "Kills per Set")
+```
 
+A quick observation indicates two potential outliers and a noticeable positive
+pattern between the variables. The outliers, however, under closer inspection, cannot
+be reasonably removed, as the teams were just low performers compared to the other
+teams in the season, which still is important to include. (i.e. 28 losses to 0 wins)
 
 # Results
 ```{r}
@@ -80,11 +82,12 @@ ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
               intercept = vb_model$coefficients[1],
               color="red")
 ```
-$$b_1 = 1.023$$
-
-
-$$b_0 = 0.596$$
-$$R^2 = .9819$$
+The slope parameter $b_1 = 1.023$, meaning that the model estimates that for each
+point change in assists, the expected point total should change by 1.023.
+The intercept parameter $b_0 = 0.596$, meaning that for 0 assists, the expected amount
+of points a team would have would be 0.596.
+$R^2 = .9819$, meaning that our model explains about 98.19% of variation in our sample.
+This is a good indicator that our model is performing well.
 
 ```{r}
 #| warning: false
@@ -94,11 +97,10 @@ ggplot(data=vb_model,aes(x=vb_model$residuals,y=vb_model$fitted.values)) +
   geom_point() +
   labs(title = "Residuals vs Fitted Values",
        y = "Residuals",
-       x = "Fitted Values",
-       geom_hline(yintercept = 0, linetype = "dashed"))
+       x = "Fitted Values")
 
 ```
-An observation of the residuals versus the fitted values revealed
+An observation of the residuals versus the fitted values revealed that our assumptions of normality and constant variance have been broken. As we can see, most of our residuals are positive, meaning that our model generally underestimates the true number of points scored, as the observed values are generally larger than the predicted values ($Y_i >\hat{Y_i}$).
 
 ```{r}
 #| warning: false
@@ -108,9 +110,32 @@ qqnorm(vb_model$residuals)
 qqline(vb_model$residuals)
 ```
 
-A quantile-quantile plot of the residuals revealed
+A quantile-quantile plot of the residuals revealed a large tail at the right end,
+signifying that there were more values on the extreme than expected under a normal
+distribution.
 
 
+# Discussion
+
+## Limitations
+
+We are aware that this data only covers D1 woman's NCAA athletes, which excludes all
+men, recreational, a co-ed players, as well as any lower division woman's teams. Also,
+we can only make statistical inferences on D1 woman's teams, since the data does not
+magnify into individual players.
+
+Our assumptions of normality and constant variance have been broken by our residual
+to fitted values plot. This is potentially due to multiple factors, such as the idea that our
+values are mostly on the extreme right end of the data, denoting that most of these D1-level teams seek out high-scoring athletes and have maintained D1 status due to this requirement.
+
+
+
+## Takeaways
+
+There is a positive correlation between the number of assists a team makes and the number of kills a team gets. In our model, each additional assist is expected to land us an additional $b_1=1.023$ points.
+
+Although this model does have a good fit due to its high $R^2=.9819$, due to violations of normality and constant variance, we may require additional data transforming, or fitting
+a different model besides simple linear regression.
 
 
 
