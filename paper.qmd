@@ -1,0 +1,117 @@
+---
+title: "An Analysis on Volleyball Statistics"
+subtitle: "Math 261A Project 1"
+author: "Robert Yav"
+thanks: "Project repository available at: [https://github.com/peteragao/MATH261A-project-template](https://github.com/peteragao/MATH261A-project-template)."
+date: today
+date-format: long
+abstract: ""
+format: pdf
+bibliography: references.bib
+---
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+#| echo: false
+library(ggplot2)
+```
+
+# Introduction
+
+Volleyball is a sport that requires elite athleticism, hand-eye coordination, open communication, and most importantly, the ability to combine all of these aspects into a functioning team. One fundamental concept of volleyball is the three touch play: Receive, set, and spike. There are, however, situations in which the ball will not need an additional touch to get a point. Then begs the question: Does one need to make assists to make more kills in volleyball? If so, how important is making an assist for earning points? This project examines the relationship between the number of kills in a game to the number of assists a team makes in a volleyball game.
+
+# Data
+
+The data set used was collected from the Division 1 Woman's NCAA Volleyball 2022-2023 season. There are 344 rows and 14 variables, with each row representing a team at the Division 1 level from the 2022-2023 season. The 14 variables include: Team, Conference, region, aces_per_set, assists_per_set, team_attacks_per_set, blocks_per_set, digs_per_set, hitting_pctg, kills_per_set, opp_hitting_pctg, W, L, and win_loss_pctg. My analysis focuses on two of the variables, kills_per_set and assists_per_set.
+
+assists_per_set - The average amount of sets, passes, or digs to a teammate that directly result in a kill per set
+
+kills_per_set - Average amount of hits that directly result in a point per set
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+vb_data=read.csv("volleyball_ncaa_div1_2022_23.csv")
+ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
+  geom_point() +
+  labs(title = "Volleyball Kills as Explained by Assists",
+       subtitle= "Data from Female NCCA Teams",
+       x = "Assists per Set",
+       y = "Kills per Set")
+```
+
+A quick observation indicates no obvious outliers and a noticable positive
+pattern between the variables.
+
+# Methods
+We fit the simple linear regression model
+
+$$Y_i = \beta_0 +\beta_1 X_i + \varepsilon_i$$
+
+  $\beta_1$ represents the expected point change in kills per set per point change in assists
+  per set.
+  
+  $\beta_0$ represents the intercept or expected number of kills per set if we had a team with 0      assists per set. In a sports organization with players playing at the highest caliber, players     will be making assists in a game, so this statistic holds no practical relevance.
+  
+  $X_i$ represents the $i^{th}$ team's assists as a predictor in the model.
+  
+  $Y_i$ represents the $i^{th}$ team's kills as a response in the model.
+  
+  We implement the analysis using R [@r_language]
+
+
+
+# Results
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+vb_model=lm(data=vb_data,vb_data$kills_per_set~vb_data$assists_per_set)
+ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
+  geom_point() +
+  labs(title = "Volleyball Kills as Explained by Assists",
+       subtitle= "Data from Female NCCA Teams",
+       x = "Assists per Set",
+       y = "Kills per Set")+
+  geom_abline(slope = vb_model$coefficients[2], 
+              intercept = vb_model$coefficients[1],
+              color="red")
+```
+$$b_1 = 1.023$$
+
+
+$$b_0 = 0.596$$
+$$R^2 = .9819$$
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+ggplot(data=vb_model,aes(x=vb_model$residuals,y=vb_model$fitted.values)) +
+  geom_point() +
+  labs(title = "Residuals vs Fitted Values",
+       y = "Residuals",
+       x = "Fitted Values",
+       geom_hline(yintercept = 0, linetype = "dashed"))
+
+```
+An observation of the residuals versus the fitted values revealed
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+qqnorm(vb_model$residuals)
+qqline(vb_model$residuals)
+```
+
+A quantile-quantile plot of the residuals revealed
+
+
+
+
+
+# References
