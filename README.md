@@ -9,7 +9,6 @@ https://data.scorenetwork.org/volleyball/volleyball_ncaa_team_stats.html
 who provide the data from the NCAA D1 Women's Volleyball records,
 https://www.ncaa.com/stats/volleyball-women/d1
 # External Resources
-The final report and code were written by Robert Yav, but
-LLM's and Peter Gao's project template/slides 
+The final report and code were written by Robert Yav, Peter Gao's project template/slides 
 (https://github.com/peteragao/MATH261A-project-template?tab=readme-ov-file)
-were used to double-check model interpretation and paper formatting.
+and LLM's were used to double-check model interpretation and paper formatting.
