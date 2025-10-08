@@ -2,10 +2,10 @@
 title: "An Analysis on NCAA Woman's Volleyball Statistics"
 subtitle: "Math 261A Project 1"
 author: "Robert Yav"
-thanks: "Project repository available at: [https://github.com/peteragao/MATH261A-project-template](https://github.com/peteragao/MATH261A-project-template)."
+thanks: "Project repository available at: [https://github.com/rubertyao/NCAAWomansVolleyballAnalysis]"
 date: today
 date-format: long
-abstract: ""
+abstract: "This paper explores the relationship between the NCAA Woman's Volleyball teams' points scored to the number of assists per team by performing a simple linear regression on the kills as explained by the number of assists. It found that although there is a positive correlation between the two variables, many assumptions of a regression on the variables have been violated and therefore require additional amendments to the model fitted."
 format: pdf
 bibliography: references.bib
 ---
@@ -16,11 +16,12 @@ bibliography: references.bib
 #| message: false
 #| echo: false
 library(ggplot2)
+library(knitr)
 ```
 
 # Introduction
 
-Volleyball is a sport that requires elite athleticism, hand-eye coordination, open communication, and most importantly, the ability to combine all of these aspects into a functioning team. One fundamental concept of volleyball is the three touch play: Receive, set, and spike. There are, however, situations in which the ball will not need an additional touch to get a point. Then begs the question: Does one need to make assists to make more kills in volleyball? If so, will teams that make more assists score more points? This project examines the relationship between the number of kills in a game to the number of assists a team makes in a volleyball game.
+Volleyball is a sport that requires elite athleticism, hand-eye coordination, open communication, and most importantly, the ability to combine all of these aspects into a functioning team. One fundamental concept of volleyball is the three touch play: Receive, set, and spike. There are, however, situations in which the ball will not need an additional touch to get a point. Then begs the question: Does one need to make assists to make more kills in volleyball? This project examines the relationship between the number of kills made for a team to the number of assists a team makes in a volleyball season. This investigation may provide insight to coaches and players who want to improve their team's point totals by identifying what to prioritize improving during training and in game.
 
 # Data
 
@@ -30,10 +31,28 @@ assists_per_set - The average amount of sets, passes, or digs to a teammate that
 
 kills_per_set - Average amount of hits that directly result in a point per set
 
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-cap: "Scatterplot of Volleyball Kills per Set and Volleyball Assists per Set"
+vb_data=read.csv("volleyball_ncaa_div1_2022_23.csv")
+ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
+  geom_point() +
+  labs(title = "Volleyball Kills as Explained by Assists",
+       subtitle= "Data from Female NCAA Teams",
+       x = "Assists per Set",
+       y = "Kills per Set")
+```
+
+A quick observation indicates two potential outliers and a noticeable positive
+pattern between the variables. The outliers, however, under closer inspection, cannot
+be reasonably removed, as the teams performed lower compared to the other
+teams in the season, which still is important to include. (i.e. 28 losses to 0 wins)
 
 
 # Methods
-We fit the simple linear regression model
+We fit the simple linear regression model:
 
 $$Y_i = \beta_0 +\beta_1 X_i + \varepsilon_i$$
 
@@ -46,46 +65,33 @@ $$Y_i = \beta_0 +\beta_1 X_i + \varepsilon_i$$
   
   $Y_i$ represents the $i^{th}$ team's kills as a response in the model.
   
-  We implement the analysis using R [@r_language]. Visual aid done in [@ggplot].
+ 
+ We implement the analysis using R [@r_language]. Visual aid done in ggplot2 [@ggplot]. Tables done with aid from knitr [@knitr].
 
 ```{r}
 #| warning: false
 #| message: false
 #| echo: false
-vb_data=read.csv("volleyball_ncaa_div1_2022_23.csv")
-ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
-  geom_point() +
-  labs(title = "Volleyball Kills as Explained by Assists",
-       subtitle= "Data from Female NCCA Teams",
-       x = "Assists per Set",
-       y = "Kills per Set")
-```
-
-A quick observation indicates two potential outliers and a noticeable positive
-pattern between the variables. The outliers, however, under closer inspection, cannot
-be reasonably removed, as the teams were just low performers compared to the other
-teams in the season, which still is important to include. (i.e. 28 losses to 0 wins)
-
-# Results
-```{r}
-#| warning: false
-#| message: false
-#| echo: false
+#| fig-cap: "Summary Table of Volleyball Model"
 vb_model=lm(data=vb_data,vb_data$kills_per_set~vb_data$assists_per_set)
-ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
-  geom_point() +
-  labs(title = "Volleyball Kills as Explained by Assists",
-       subtitle= "Data from Female NCCA Teams",
-       x = "Assists per Set",
-       y = "Kills per Set")+
-  geom_abline(slope = vb_model$coefficients[2], 
-              intercept = vb_model$coefficients[1],
-              color="red")
+summary = summary(vb_model)
+kable(summary$coefficients)
+
 ```
+We attempt a two-tailed hypothesis test for $\beta_1$ with $\alpha=0.05$:
+
+
+$$H_0: \beta_1=0$$
+
+$$H_a: \beta_1\neq 0$$
+
 The slope parameter $b_1 = 1.023$, meaning that the model estimates that for each
 point change in assists, the expected point total should change by 1.023.
 The intercept parameter $b_0 = 0.596$, meaning that for 0 assists, the expected amount
 of points a team would have would be 0.596.
+
+
+Since our p value P(t<134.201)$\sim 0$ is much smaller than our $\alpha=0.05$, we can reject the null hypothesis, meaning that there is statistically significant evidence of a relationship between assists and kills.
 $R^2 = .9819$, meaning that our model explains about 98.19% of variation in our sample.
 This is a good indicator that our model is performing well.
 
@@ -93,6 +99,23 @@ This is a good indicator that our model is performing well.
 #| warning: false
 #| message: false
 #| echo: false
+#| fig-cap: "Scatterplot of Volleyball Kills per Set and Volleyball Assists per Set with Fitted Linear Regression Model"
+ggplot(data=vb_data,aes(x=assists_per_set,y=kills_per_set)) +
+  geom_point() +
+  labs(title = "Volleyball Kills as Explained by Assists",
+       subtitle= "Data from Female NCAA Teams",
+       x = "Assists per Set",
+       y = "Kills per Set")+
+  geom_abline(slope = vb_model$coefficients[2], 
+              intercept = vb_model$coefficients[1],
+              color="red")
+```
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+#| fig-cap: "Residuals vs Fitted Values Plot"
 ggplot(data=vb_model,aes(x=vb_model$residuals,y=vb_model$fitted.values)) +
   geom_point() +
   labs(title = "Residuals vs Fitted Values",
@@ -100,24 +123,26 @@ ggplot(data=vb_model,aes(x=vb_model$residuals,y=vb_model$fitted.values)) +
        x = "Fitted Values")
 
 ```
-An observation of the residuals versus the fitted values revealed that our assumptions of normality and constant variance have been broken. As we can see, most of our residuals are positive, meaning that our model generally underestimates the true number of points scored, as the observed values are generally larger than the predicted values ($Y_i >\hat{Y_i}$).
+An observation of the residuals versus the fitted values revealed that our assumption of equal variance have been broken. As we can see, most of our residuals are positive, meaning that our model generally underestimates the true number of points scored, as the observed values are generally larger than the predicted values ($Y_i >\hat{Y_i}$).
 
 ```{r}
 #| warning: false
 #| message: false
 #| echo: false
+#| fig-cap: "QQ-Plot of Residuals"
 qqnorm(vb_model$residuals)
 qqline(vb_model$residuals)
 ```
 
-A quantile-quantile plot of the residuals revealed a large tail at the right end,
-signifying that there were more values on the extreme than expected under a normal
-distribution.
+A quantile-quantile plot of the residuals revealed a large tail at the right end, signifying that there were more values on the extreme than expected under a normal distribution. This violates the assumption of normally distributed errors, but with a high enough sample size, this may be overlooked.
 
+
+# Results
+
+
+There is a positive correlation between the number of assists a team makes and the number of kills a team gets. In our model, each additional assist is expected to land us an additional $b_1=1.023$ kills. We take caution in this conclusion though, as the assumptions that allow us to make an estimate on the true value of $\beta_1$ have been broken, constant variance and normality of errors. Although this model does have a good fit due to its high $R^2=.9819$ and low p-value $p\sim 0<0.05$, again due to violations of normality and constant variance, we may require additional variables, data transformation, or fitting a different model besides simple linear regression.
 
 # Discussion
-
-## Limitations
 
 We are aware that this data only covers D1 woman's NCAA athletes, which excludes all
 men, recreational, a co-ed players, as well as any lower division woman's teams. Also,
@@ -126,16 +151,8 @@ magnify into individual players.
 
 Our assumptions of normality and constant variance have been broken by our residual
 to fitted values plot. This is potentially due to multiple factors, such as the idea that our
-values are mostly on the extreme right end of the data, denoting that most of these D1-level teams seek out high-scoring athletes and have maintained D1 status due to this requirement.
+values are mostly on the extreme right end of the data, denoting that most of these D1-level teams seek out high-scoring athletes and have maintained D1 status due to this requirement. The fact that in order for an assist to be made, a kill must occur could have an influence on the violation of our assumptions, so better variable selection to also include "passes and sets that do not result in kills" in "assists" could be investigated.
 
-
-
-## Takeaways
-
-There is a positive correlation between the number of assists a team makes and the number of kills a team gets. In our model, each additional assist is expected to land us an additional $b_1=1.023$ points.
-
-Although this model does have a good fit due to its high $R^2=.9819$, due to violations of normality and constant variance, we may require additional data transforming, or fitting
-a different model besides simple linear regression.
 
 
 
