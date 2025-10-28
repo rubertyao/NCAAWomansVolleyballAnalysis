@@ -1,5 +1,6 @@
 Code and Report Created by: Robert Yav
 Draft 1 Completed: 9/24/25
+Draft 2 Completed: 10/7/25
 
 This project explores the relationship between the amount of kills and the amount
 of assists a set a NCAA D1 woman's team makes during the 2022-2023 season.
