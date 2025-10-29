@@ -84,6 +84,7 @@ colnames(summarycoef)=c("Estimate","Standard Error", "t-value", "P-Value")
 kable(summarycoef)
 
 ```
+\newpage
 We attempt a two-tailed hypothesis test for $\beta_1$ with $\alpha=0.05$ in @fig-summ-table:
 
 
@@ -96,8 +97,7 @@ point change in assists, the expected point total should change by 1.023.
 The intercept parameter $b_0 = 0.596$, meaning that for 0 assists, the expected amount
 of points a team would have would be 0.596.
 
-
-Since our p value in @fig-summ-table P(t<134.201)= 2.642251e-291 is much smaller than our $\alpha=0.05$, we can reject the null hypothesis, meaning that there is statistically significant evidence of a relationship between assists and kills. Note that in @fig-summ-table we have obtained a value of 0, meaning that the value is so low that R cannot reasonably show the number in its entirety. We note that since the number is so low, the chances of a true linear relationship between the two variables is so high that a hypothesis test is almost not needed to confirm it.
+Since our p value in @fig-summ-table P(t<134.201)= 2.642e-291 is much smaller than our $\alpha=0.05$, we can reject the null hypothesis, meaning that there is statistically significant evidence of a relationship between assists and kills. Note that in @fig-summ-table we have obtained a value of 0, meaning that the value is so low that R cannot reasonably show the number in its entirety. We note that since the number is so low, the chances of a true linear relationship between the two variables is so high that a hypothesis test is almost not needed to confirm it.
 $R^2 = .9819$, meaning that our model explains about 98.19% of variation in our sample.
 This is a good indicator that our model is performing well.
 
@@ -147,7 +147,7 @@ qqnorm(vb_model$residuals)
 qqline(vb_model$residuals)
 ```
 
-A quantile-quantile plot in @fig-qq-plot comparing the distribution of our values to a normal distribution revealed a large tail at the right end, signifying that there were more values on the extreme than expected under a theoretical normal distribution, represented by the line drawn. This violates the assumption of normally distributed errors, but since our sample size is sufficient enough to overlook this, we can safely continue.
+A major violation of normality of errors would bias the parameter estimates, providing an unreliable p-value. A quantile-quantile plot in @fig-qq-plot comparing the distribution of our values to a normal distribution revealed a large tail at the right end, signifying that there were more values on the extreme than expected under a theoretical normal distribution, represented by the line drawn. This violates the assumption of normally distributed errors, but since our sample size is sufficient enough to overlook this, we can safely continue.
 
 
 # Results
